@@ -1,47 +1,47 @@
 <?php
+require_once 'dbmanage.php';
 
-    $pdo = new PDO('mysql:host=localhost;dbname=keiziban;','root');
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+    $db = new dbmanage();
 
-    if (isset($_POST['name']) && isset($_POST['text'])) {
+    $name = htmlspecialchars($_POST['name']);
+    $text = htmlspecialchars($_POST['text']);
 
-        $name = $_POST['name'];
-        $text = $_POST['contents'];
-        //セキュリティー
-        $name = htmlspecialchars($name);
-        $text = htmlspecialchars($text);
+    $db->post($name,$text);
 
-    }
-    elseif (!isset($_POST['name'])){
-        echo '名前が入力されていません';
-        header('Location: index.html');
-        exit();
-    }
-    elseif (!isset($_POST['text'])){
-        echo '投稿の中身がありません';
-        header('Location: index.html');
-        exit();
-    }
+}
+?>
 
-    else{
-        header('Location: index.html');
-        exit();
-    }
 
-    $dsn = 'mysql:host=localhost;dbname=keiziban;';
-    $user ='root';
-    $password = '';
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="js/jquery-1.8.2.min.js"></script>
+    <script src="js/jquery.validationEngine.js"></script>
+    <script src="js/languages/jquery.validationEngine-ja.js"></script>
+    <link rel="stylesheet" href="css/validationEngine.jquery.css">
+    <title>掲示板</title>
+    <script>
+        $(function(){
+            jQuery("#form").validationEngine();
+        });
+    </script>
+</head>
+<body style="text-align: center">
+<h1 style="text-align: center">掲示板</h1>
+    <h2>新規投稿</h2>
+    <P>名前は20文字、本文は140文字までで入力してください。</P>
 
-    try{
-        $db = new PDO($dsn,$user,$password);
-        $stmt = $db -> prepare('INSERT INTO post(name,contents)VALUES(:name,:contents)');
-
-        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
-        $stmt->bindParam(':contents', $text, PDO::PARAM_STR);
-        // クエリの実行
-        $stmt->execute();
-        header('Location: index.html');
-        exit();
-    }
-    catch(PDOException $e) {
-        die ('エラー:' . $e->getMessage());
-    }
+    <form action="index.php" method="post" id="form">
+        名前: <input type="text" name="name" class="validate[required,maxSize[20]]"><br>
+        本文: <textarea name="text" class="validate[required,maxSize[140]]"></textarea><br>
+        <button type="submit">投稿</button>
+    </form>
+    <h2>投稿一覧</h2>
+    <?php
+        $db = new dbmanage();
+        $db->post_list();
+    ?>
+</body>
+</html>
