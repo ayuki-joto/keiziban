@@ -3,9 +3,29 @@ require_once 'dbmanage.php';
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
     $db = new dbmanage();
+    if ($_POST['name'] == null){
+        header('Location: index.php');
+        exit();
+    }
+    elseif (mb_strlen($_POST['name'])>20){
+        header('Location: index.php');
+        exit();
+    }
+    else{
+        $name = htmlspecialchars($_POST['name']);
+    }
 
-    $name = htmlspecialchars($_POST['name']);
-    $text = htmlspecialchars($_POST['text']);
+    if ($_POST['text'] == null){
+        header('Location: index.php');
+        exit();
+    }
+    elseif (mb_strlen($_POST['text'])>140){
+        header('Location: index.php');
+        exit();
+    }
+    else {
+        $text = htmlspecialchars($_POST['text']);
+    }
 
     $db->post($name,$text);
 
